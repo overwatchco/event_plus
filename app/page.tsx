@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { Footer, Navbar } from "./components";
-
+import { Navbar } from "./components";
 import Logo_event from '../public/event+_horizontal_blanco.png';
 import Link from "next/link";
 
