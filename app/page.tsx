@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Navbar } from "./components";
+import { Navbar } from "../components";
 import Overwatch_logo from '../public/logo-o-horizontal-negativo.png';
 import Logo_event from '../public/event+_horizontal_blanco.png';
 import Link from "next/link";
