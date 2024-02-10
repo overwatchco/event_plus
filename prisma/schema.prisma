@@ -32,6 +32,7 @@ model Usuario {
 model Empresa {
   id           String     @id @default(uuid())
   nit          String     @unique
+  nombre       String
   pais         String
   departamento String
   ciudad       String
