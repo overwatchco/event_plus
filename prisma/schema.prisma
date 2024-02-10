@@ -22,11 +22,11 @@ model Usuario {
   nit      String?   @unique
   cedula   Int       @unique
   nombre   String
-  email    String
+  email    String    @unique
   password String
   rol      Role      @default(NONE)
-  Empresa  Empresa[]
-  Actas    Actas[]
+  empresa  Empresa[]
+  acta     Acta[]
 }
 
 model Empresa {
@@ -43,48 +43,48 @@ model Empresa {
 }
 
 model Contrato {
-  id        String      @id @default(uuid())
-  nit       String      @unique
+  id        String    @id @default(uuid())
+  nit       String    @unique
   objeto    String?
-  empresa   Empresa     @relation(fields: [empresaId], references: [id])
+  empresa   Empresa   @relation(fields: [empresaId], references: [id])
   empresaId String
-  Reuniones Reuniones[]
-  Eventos   Eventos[]
+  reunion   Reunion[]
+  evento    Evento[]
 }
 
-model Reuniones {
+model Reunion {
   id         String   @id @default(uuid())
   objetivo   String?
   contrato   Contrato @relation(fields: [contratoId], references: [id])
   contratoId String
-  Actas      Actas[]
+  acta       Acta[]
 }
 
-model Actas {
-  id        String    @id @default(uuid())
-  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
+model Acta {
+  id        String  @id @default(uuid())
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
   usuarioId String
-  reunion   Reuniones @relation(fields: [reunionId], references: [id])
+  reunion   Reunion @relation(fields: [reunionId], references: [id])
   reunionId String
 }
 
-model Eventos {
-  id             String           @id @default(uuid())
-  Requerimientos Requerimientos[]
-  contrato       Contrato         @relation(fields: [contratoId], references: [id])
+model Evento {
+  id             String          @id @default(uuid())
+  requerimientos Requerimiento[]
+  contrato       Contrato        @relation(fields: [contratoId], references: [id])
   contratoId     String
 }
 
-model Requerimientos {
-  id       String     @id @default(uuid())
-  evento   Eventos    @relation(fields: [eventoId], references: [id])
+model Requerimiento {
+  id       String   @id @default(uuid())
+  evento   Evento   @relation(fields: [eventoId], references: [id])
   eventoId String
-  Imagenes Imagenes[]
+  imagen   Imagen[]
 }
 
-model Imagenes {
-  id              String         @id @default(uuid())
-  path            String
-  requerimiento   Requerimientos @relation(fields: [requerimientoId], references: [id])
+model Imagen {
+  id              String        @id @default(uuid())
+  path            String        @unique
+  requerimiento   Requerimiento @relation(fields: [requerimientoId], references: [id])
   requerimientoId String
 }
