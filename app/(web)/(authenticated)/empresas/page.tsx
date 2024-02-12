@@ -1,18 +1,34 @@
-import { EmpresaForm } from "@/components/empresas/empresa-form";
 import { Separator } from "@/components/ui/separator";
+import { Payment, columns } from "@/components/empresas/columns"
+import { DataTable } from "@/components/empresas/data-table"
 
-export default function EmpresasPage() {
+async function getData(): Promise<Payment[]> {
+  // Fetch data from your API here.
+  return [
+    {
+      id: "728ed52f",
+      amount: 100,
+      status: "pending",
+      email: "m@example.com",
+    },
+    {
+      id: "489e1d42",
+      amount: 125,
+      status: "processing",
+      email: "example@gmail.com",
+    },
+    // ...
+  ]
+}
+export default async function EmpresasPage() {
+  const data = await getData()
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Account</h3>
-        <p className="text-sm text-muted-foreground">
-          Update your account settings. Set your preferred language and
-          timezone.
-        </p>
-      </div>
       <Separator />
-      <EmpresaForm />
+      <div className="container mx-auto py-10">
+        <DataTable columns={columns} data={data} />
+      </div>
     </div>
+
   )
 }
