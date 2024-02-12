@@ -29,6 +29,9 @@ model Usuario {
   acta     Acta[]
 }
 
+// TODO: Posible cambio a la estructura usando encargado
+// y trabajadores asociados
+
 model Empresa {
   id           String     @id @default(uuid())
   nit          String     @unique
@@ -37,7 +40,7 @@ model Empresa {
   departamento String
   ciudad       String
   direccion    String
-  telefono     String
+  telefono     Int
   usuario      Usuario    @relation(fields: [usuarioId], references: [id])
   usuarioId    String
   Contrato     Contrato[]
@@ -46,7 +49,7 @@ model Empresa {
 model Contrato {
   id        String    @id @default(uuid())
   nit       String    @unique
-  objeto    String?
+  objeto    String
   empresa   Empresa   @relation(fields: [empresaId], references: [id])
   empresaId String
   reunion   Reunion[]
@@ -55,7 +58,7 @@ model Contrato {
 
 model Reunion {
   id         String   @id @default(uuid())
-  objetivo   String?
+  objetivo   String
   contrato   Contrato @relation(fields: [contratoId], references: [id])
   contratoId String
   acta       Acta[]
@@ -71,16 +74,20 @@ model Acta {
 
 model Evento {
   id             String          @id @default(uuid())
+  fecha          DateTime
+  nombre         String
   requerimientos Requerimiento[]
   contrato       Contrato        @relation(fields: [contratoId], references: [id])
   contratoId     String
 }
 
 model Requerimiento {
-  id       String   @id @default(uuid())
-  evento   Evento   @relation(fields: [eventoId], references: [id])
-  eventoId String
-  imagen   Imagen[]
+  id          String   @id @default(uuid())
+  evento      Evento   @relation(fields: [eventoId], references: [id])
+  nombre      String
+  descripcion String?
+  eventoId    String
+  imagen      Imagen[]
 }
 
 model Imagen {
