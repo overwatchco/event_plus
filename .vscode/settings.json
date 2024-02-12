@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "prisma",
-        "enpoint"
+        "enpoint",
+        "ui"
     ]
 }
