@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "prisma",
         "enpoint",
-        "ui"
+        "ui",
+        "empresas"
     ]
 }
