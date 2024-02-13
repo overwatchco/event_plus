@@ -1,34 +1,23 @@
 import { Separator } from "@/components/ui/separator";
-import { Payment, columns } from "@/components/empresas/columns"
+import { columns } from "@/components/empresas/columns"
 import { DataTable } from "@/components/empresas/data-table"
+import prisma from "@/app/lib/prisma";
 
-async function getData(): Promise<Payment[]> {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-    },
-    {
-      id: "489e1d42",
-      amount: 125,
-      status: "processing",
-      email: "example@gmail.com",
-    },
-    // ...
-  ]
-}
+
+
 export default async function EmpresasPage() {
-  const data = await getData()
+
+  // TODO: Poner que esto este filtrado por el usuario que es encargado de la empresa
+  const data = await prisma.empresa.findMany({ orderBy: { nombre: 'desc' } })
   return (
-    <div className="space-y-6">
+
+    //TODO: Añadir el boton para crear una empresa con modal
+    <>
       <Separator />
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto py-5">
         <DataTable columns={columns} data={data} />
       </div>
-    </div>
+    </>
 
   )
 }

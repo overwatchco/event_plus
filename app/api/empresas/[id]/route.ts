@@ -11,6 +11,10 @@ interface Segments {
 }
 
 
+
+// TODO: Obtener empresas lista de emrpesas filtrado por usuario
+
+
 const getEmpresa = async (id: string): Promise<Empresa | null> => {
     const empresa = await prisma.empresa.findFirst({ where: { id } })
     return empresa

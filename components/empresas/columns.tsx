@@ -12,32 +12,52 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-    id: string
-    amount: number
-    status: "pending" | "processing" | "success" | "failed"
-    email: string
+
+
+export type Empresa = {
+    id: string,
+    nombre: String,
+    nit: String,
+    pais: String,
+    departamento: String,
+    ciudad: String,
+    direccion: String,
+    telefono: Number,
 }
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Empresa>[] = [
     {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: "nombre",
+        header: "Nombre",
     },
     {
-        accessorKey: "email",
-        header: "Email",
+        accessorKey: "nit",
+        header: "Nit",
     },
     {
-        accessorKey: "amount",
-        header: "Amount",
+        accessorKey: "pais",
+        header: "Pais",
+    },
+    {
+        accessorKey: "departamento",
+        header: "Departamento",
+    },
+    {
+        accessorKey: "ciudad",
+        header: "Ciudad",
+    },
+    {
+        accessorKey: "direccion",
+        header: "Direccion",
+    },
+    {
+        accessorKey: "telefono",
+        header: "Telefono",
     },
     {
         id: "actions",
         cell: ({ row }) => {
-            const payment = row.original
+            const empresa = row.original
 
             return (
                 <DropdownMenu>
@@ -50,12 +70,12 @@ export const columns: ColumnDef<Payment>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(payment.id)}
+                            onClick={() => navigator.clipboard.writeText(empresa.id)}
                         >
                             Copy payment ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
+                        <DropdownMenuItem>Ver empresa</DropdownMenuItem>
                         <DropdownMenuItem>View payment details</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
