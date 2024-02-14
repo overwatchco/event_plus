@@ -31,51 +31,105 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { toast } from "@/components/ui/use-toast"
+import { addEmpresa } from "@/actions/empresa-actions"
 
-const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
-] as const
 
-const accountFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, {
-      message: "Name must be at least 2 characters.",
+
+
+
+// NOTE: Esto tiene que venir de la base de datos
+
+const paises = [
+  { label: "Estados Unidos", value: "us" },
+  { label: "Francia", value: "fr" },
+  { label: "Alemania", value: "de" },
+  { label: "España", value: "es" },
+  { label: "Portugal", value: "pt" },
+  { label: "Rusia", value: "ru" },
+  { label: "Japón", value: "ja" },
+  { label: "Corea del Sur", value: "ko" },
+  { label: "China", value: "zh" },
+  { label: "Colombia", value: "co" },
+] as const;
+
+
+
+const departamentosColombia = [
+  { label: "Antioquia", value: "Antioquia" },
+  { label: "Bolívar", value: "Bolívar" },
+  { label: "Boyacá", value: "Boyacá" },
+  { label: "Cauca", value: "Cauca" },
+  { label: "Cesar", value: "Cesar" },
+  { label: "Chocó", value: "Chocó" },
+  { label: "Magdalena", value: "Magdalena" },
+] as const;
+
+
+const ciudadesColombia = [
+  { label: "Medellín", value: "Medellín" },
+  { label: "Cartagena", value: "Cartagena" },
+  { label: "Tunja", value: "Tunja" },
+  { label: "Popayán", value: "Popayán" },
+  { label: "Valledupar", value: "Valledupar" },
+  { label: "Quibdó", value: "Quibdó" },
+  { label: "Santa Marta", value: "Santa Marta" },
+] as const;
+
+
+
+
+const empresaFormSchema = z.object({
+  nombre: z
+    .string({ required_error: "El nombre es obligatorio" })
+    .min(3, {
+      message: "El nombre debe tener al menos 3 caracteres.",
     })
     .max(30, {
-      message: "Name must not be longer than 30 characters.",
+      message: "El nombre no debe tener mas de 30 caracteres.",
     }),
-  dob: z.date({
-    required_error: "A date of birth is required.",
+
+  //TODO: Colocar una validacion del nit de acuerdo a la norma
+  nit: z
+    .string({ required_error: "El nit es obligatorio" })
+    .min(2, { message: "El nit debe tener al menos 10 caracteres" })
+    .max(30, { message: "Debe tener menos de 30 caracteres" }),
+  pais: z.string({
+    required_error: "Seleccione un pais",
   }),
-  language: z.string({
-    required_error: "Please select a language.",
+  departamento: z.string({
+    required_error: "Seleccione un departamento",
   }),
+  ciudad: z.string({
+    required_error: "Seleccione una ciudad",
+  }),
+  direccion: z.string({
+    required_error: "Seleccione una ciudad",
+  }),
+  telefono: z.number({
+    required_error: "Ingrese un numero telefonico",
+  }),
+  usuarioId: z.string({
+    required_error: "Seleccione una ciudad",
+  }),
+
 })
 
-type AccountFormValues = z.infer<typeof accountFormSchema>
+type empresaFormValues = z.infer<typeof empresaFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  // name: "Your name",
-  // dob: new Date("2023-01-23"),
+//NOTE: Colocar valor de deafault de id usuario 
+const defaultValues: Partial<empresaFormValues> = {
+  // usuarioId: "uuid()",
 }
 
 export function EmpresaForm() {
-  const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountFormSchema),
+  const form = useForm<empresaFormValues>({
+    resolver: zodResolver(empresaFormSchema),
     defaultValues,
   })
 
-  function onSubmit(data: AccountFormValues) {
+  function onSubmit(data: empresaFormValues) {
+
+    addEmpresa(data)
     toast({
       title: "You submitted the following values:",
       description: (
@@ -89,129 +143,277 @@ export function EmpresaForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+
+        {/* NOTE:  Campo de nit */}
         <FormField
           control={form.control}
-          name="name"
+          name="nit"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nit</FormLabel>
               <FormControl>
-                <Input placeholder="Your name" {...field} />
+                <Input placeholder="Nit" {...field} />
               </FormControl>
               <FormDescription>
-                This is the name that will be displayed on your profile and in
-                emails.
+                Identificador unico de la empresa
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="dob"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+
+
+        <div className="flex gap-3">
+          {/* NOTE: Campo de nombre */}
+
+          <div className="grow">
+            <FormField
+              control={form.control}
+              name="nombre"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
+                    <Input placeholder="Nombre" {...field} />
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="language"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Language</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grow">
+            <FormField
+              control={form.control}
+              name="telefono"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Telefono</FormLabel>
                   <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[200px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value
+                    <Input type="tel" placeholder="Numero de telefono" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+
+        </div>
+
+
+
+
+        {/* NOTE: Este campo tiene que venir de la base de datos 
+        y no mostrarse por que no se puede cambiar xd */}
+        <div className="hidden">
+
+          {/* NOTE: Campo Usuario id */}
+          <FormField
+            control={form.control}
+            name="usuarioId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre</FormLabel>
+                <FormControl>
+                  <Input placeholder="Your name" {...field} />
+                </FormControl>
+                <FormDescription>
+                  This is the name that will be displayed on your profile and in
+                  emails.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+
+        <div className="flex gap-3">
+          {/* NOTE: Campo de Pais */}
+          <FormField
+            control={form.control}
+            name="pais"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Pais</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-[200px] justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value
+                          ? paises.find(
+                            (pais) => pais.value === field.value
                           )?.label
-                        : "Select language"}
-                      <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search language..." />
-                    <CommandEmpty>No language found.</CommandEmpty>
-                    <CommandGroup>
-                      {languages.map((language) => (
-                        <CommandItem
-                          value={language.label}
-                          key={language.value}
-                          onSelect={() => {
-                            form.setValue("language", language.value)
-                          }}
-                        >
-                          <CheckIcon
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              language.value === field.value
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                          {language.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormDescription>
-                This is the language that will be used in the dashboard.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Update account</Button>
+                          : "Seleccione un pais"}
+                        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Buscar pais..." />
+                      <CommandEmpty>No pais found.</CommandEmpty>
+                      <CommandGroup>
+                        {paises.map((pais) => (
+                          <CommandItem
+                            value={pais.label}
+                            key={pais.value}
+                            onSelect={() => {
+                              form.setValue("pais", pais.value)
+                            }}
+                          >
+                            <CheckIcon
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                pais.value === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {pais.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* NOTE: Campo de Departamento */}
+          <FormField
+            control={form.control}
+            name="departamento"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Departamento</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-[230px] justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value
+                          ? departamentosColombia.find(
+                            (departamento) => departamento.value === field.value
+                          )?.label
+                          : "Seleccione un departamento"}
+                        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Buscar departamento..." />
+                      <CommandEmpty>No se encuentra el departamento.</CommandEmpty>
+                      <CommandGroup>
+                        {departamentosColombia.map((departamento) => (
+                          <CommandItem
+                            value={departamento.label}
+                            key={departamento.value}
+                            onSelect={() => {
+                              form.setValue("departamento", departamento.value)
+                            }}
+                          >
+                            <CheckIcon
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                departamento.value === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {departamento.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* NOTE: Campo de Ciudad */}
+          <FormField
+            control={form.control}
+            name="ciudad"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Ciudad</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-[205px] justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value
+                          ? ciudadesColombia.find(
+                            (ciudad) => ciudad.value === field.value
+                          )?.label
+                          : "Seleccione una ciudad"}
+                        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Buscar ciudad..." />
+                      <CommandEmpty>No se encuentra la ciuad.</CommandEmpty>
+                      <CommandGroup>
+                        {ciudadesColombia.map((ciudad) => (
+                          <CommandItem
+                            value={ciudad.label}
+                            key={ciudad.value}
+                            onSelect={() => {
+                              form.setValue("ciudad", ciudad.value)
+                            }}
+                          >
+                            <CheckIcon
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                ciudad.value === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {ciudad.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex justify-center">
+
+          <Button type="submit">Guardar</Button>
+        </div>
       </form>
     </Form>
   )
