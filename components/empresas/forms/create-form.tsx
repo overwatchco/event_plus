@@ -1,13 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
-import { format } from "date-fns"
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Command,
   CommandEmpty,
@@ -105,7 +103,7 @@ const empresaFormSchema = z.object({
   direccion: z.string({
     required_error: "Seleccione una ciudad",
   }),
-  telefono: z.number({
+  telefono: z.coerce.number({
     required_error: "Ingrese un numero telefonico",
   }),
   usuarioId: z.string({
@@ -128,18 +126,26 @@ export function EmpresaForm() {
   })
 
   function onSubmit(data: empresaFormValues) {
-
     addEmpresa(data)
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+      .then((empresa) => {
+        // La promesa se resolvió correctamente
+        toast({
+          title: "Empresa creada con éxito",
+          description: (
+            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+              <code className="text-white">{JSON.stringify(empresa, null, 2)}</code>
+            </pre>
+          ),
+        });
+      })
+      .catch((error) => {
+        // La promesa tuvo un error
+        console.error('Error al crear la empresa:', error);
+        toast({
+          title: "Error al crear la empresa",
+        });
+      });
   }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -206,7 +212,7 @@ export function EmpresaForm() {
 
         {/* NOTE: Este campo tiene que venir de la base de datos 
         y no mostrarse por que no se puede cambiar xd */}
-        <div className="hidden">
+        <div>
 
           {/* NOTE: Campo Usuario id */}
           <FormField
@@ -222,6 +228,19 @@ export function EmpresaForm() {
                   This is the name that will be displayed on your profile and in
                   emails.
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="direccion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Direccion</FormLabel>
+                <FormControl>
+                  <Input placeholder="Your name" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

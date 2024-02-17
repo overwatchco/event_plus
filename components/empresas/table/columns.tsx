@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -12,6 +11,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
+
+
+import { UpdateDialog } from "../dialogs/update-dialog"
+import { DeleteDialog } from "../dialogs/delete-dialog"
 
 
 export type Empresa = {
@@ -68,15 +72,16 @@ export const columns: ColumnDef<Empresa>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(empresa.id)}
-                        >
-                            Copy payment ID
-                        </DropdownMenuItem>
+                        <div className="flex flex-col justify-center">
+                            <DropdownMenuLabel className="text-center">Acciones</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+
+
+                            <UpdateDialog id={empresa.id}></UpdateDialog>
+                            {/* <DeleteDialog></DeleteDialog> */}
+                        </div>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Ver empresa</DropdownMenuItem>
-                        <DropdownMenuItem>View payment details</DropdownMenuItem>
+                        <DropdownMenuItem >Ver empresa</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

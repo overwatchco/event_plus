@@ -9,7 +9,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { EmpresaForm } from "./empresa-form"
+import { EmpresaForm } from "../forms/create-form"
 
 export function CreateDialog() {
     return (

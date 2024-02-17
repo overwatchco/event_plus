@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
-import { columns } from "@/components/empresas/columns"
-import { DataTable } from "@/components/empresas/data-table"
+import { columns } from "@/components/empresas/table/columns"
+import { DataTable } from "@/components/empresas/table/data-table"
 import prisma from "@/app/lib/prisma";
 
 

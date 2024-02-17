@@ -1,4 +1,4 @@
-import { CreateDialog } from "@/components/empresas/create-dialog"
+import { CreateDialog } from "@/components/empresas/dialogs/create-dialog"
 import { Metadata } from "next"
 
 
