@@ -15,7 +15,7 @@ import {
 
 
 import { UpdateDialog } from "../dialogs/update-dialog"
-import { DeleteDialog } from "../dialogs/delete-dialog"
+import { DeleteAlertDialog } from "../dialogs/delete-dialog"
 
 
 export type Empresa = {
@@ -78,7 +78,8 @@ export const columns: ColumnDef<Empresa>[] = [
 
 
                             <UpdateDialog id={empresa.id}></UpdateDialog>
-                            {/* <DeleteDialog></DeleteDialog> */}
+
+                            <DeleteAlertDialog id={empresa.id} nombre={empresa.nombre}></DeleteAlertDialog>
                         </div>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem >Ver empresa</DropdownMenuItem>

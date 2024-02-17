@@ -18,6 +18,7 @@ export const addEmpresa = async (data:
     }
 ) => {
     const empresa = await prisma.empresa.create({ data })
+    revalidatePath('/empresas')
     return empresa
 }
 
@@ -66,4 +67,15 @@ export const getEmpresa = async (id: string): Promise<Empresa> => {
     }
 
     return empresa
+}
+
+
+//Eliminar empresa
+
+export const deleteEmpresa = async (id: string): Promise<void> => {
+
+
+    await prisma.empresa.delete({ where: { id } })
+    revalidatePath('/empresas')
+
 }

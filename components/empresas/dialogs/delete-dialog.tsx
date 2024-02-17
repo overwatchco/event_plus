@@ -1,40 +1,41 @@
-import { Button } from "@/components/ui/button"
+import { deleteEmpresa } from "@/actions/empresa-actions"
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-
-import { UpdateForm } from "../forms/update-form"
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 
 interface Props {
-    id: string
+    id: string,
+    nombre: String
 }
 
-export function DeleteDialog({ id }: Props) {
+export function DeleteAlertDialog({ id, nombre }: Props) {
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant={"ghost"}>Eliminar</Button>
-            </DialogTrigger>
-            <DialogContent >
-                <DialogHeader>
-                    <DialogTitle>Actualizar Empresa</DialogTitle>
-                    <DialogDescription>
-                        Ingresa los datos de tu empresa
-                    </DialogDescription>
-                </DialogHeader>
-
-
-
-                {/* contenido de el dialog */}
-                {/* <UpdateForm /> */}
-                {/* contenido de el dialog */}
-            </DialogContent>
-        </Dialog>
+        <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button variant="outline">Eliminar</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Esta seguro de eliminar la empresa {nombre}?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Esta accion no se puede desahacer. Eliminara permanentemente los
+                        datos de la empresa.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => deleteEmpresa(id)}>Continuar</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     )
 }
