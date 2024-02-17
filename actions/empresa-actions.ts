@@ -79,3 +79,15 @@ export const deleteEmpresa = async (id: string): Promise<void> => {
     revalidatePath('/empresas')
 
 }
+
+
+//Get empresas 
+export const getListEmpresa = async (): Promise<Empresa[]> => {
+
+    const empresas = await prisma.empresa.findMany({ orderBy: { nombre: 'desc' } })
+    if (!empresas) {
+        throw `No hay empresas registradas`
+    }
+
+    return empresas
+}
