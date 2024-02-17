@@ -21,7 +21,7 @@ export function DeleteAlertDialog({ id, nombre }: Props) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="outline">Eliminar</Button>
+                <Button variant="ghost">Eliminar</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
