@@ -1,14 +1,25 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { UserNav } from "@/components/dashboard/user-nav";
+import { getServerSession } from "next-auth";
 import Image from "next/image"
+import { redirect } from "next/navigation";
 
 
-export default function AuthLayout({
+export default async function AuthLayout({
     children
 }: {
     children: React.ReactNode;
 }) {
+    const session = await getServerSession(authOptions)
+
+
+    if (!session) {
+        redirect('/api/auth/signin')
+
+    }
+
     return (
-        <div className="flex-col md:flex">
+        <div className="flex-col md:flex" >
             <div className="border-b">
                 <div className="flex h-16 items-center px-4">
                     <Image
@@ -25,6 +36,6 @@ export default function AuthLayout({
                 </div>
             </div>
             {children}
-        </div>
+        </div >
     );
 }
