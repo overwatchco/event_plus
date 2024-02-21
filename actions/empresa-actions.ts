@@ -14,7 +14,7 @@ export const addEmpresa = async (data:
         ciudad: string,
         direccion: string,
         telefono: number,
-        usuarioId: string
+        userId: string
     }
 ) => {
     const empresa = await prisma.empresa.create({ data })

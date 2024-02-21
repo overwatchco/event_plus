@@ -106,7 +106,7 @@ const empresaFormSchema = z.object({
   telefono: z.coerce.number({
     required_error: "Ingrese un numero telefonico",
   }),
-  usuarioId: z.string({
+  userId: z.string({
     required_error: "Seleccione una ciudad",
   }),
 
@@ -116,14 +116,19 @@ type empresaFormValues = z.infer<typeof empresaFormSchema>
 
 //NOTE: Colocar valor de deafault de id usuario 
 const defaultValues: Partial<empresaFormValues> = {
-  // usuarioId: "uuid()",
+  // userId: "uuid()",
 }
 
-export function EmpresaForm() {
+interface Props {
+  sessionUser: string
+}
+
+export function EmpresaForm({ sessionUser }: Props) {
   const form = useForm<empresaFormValues>({
     resolver: zodResolver(empresaFormSchema),
     defaultValues,
   })
+
 
   function onSubmit(data: empresaFormValues) {
     addEmpresa(data)
@@ -217,16 +222,15 @@ export function EmpresaForm() {
           {/* NOTE: Campo Usuario id */}
           <FormField
             control={form.control}
-            name="usuarioId"
+            name="userId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre</FormLabel>
+                <FormLabel>Id Usuario</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your name" {...field} />
+                  <Input placeholder="Id del usuario" {...field} value={sessionUser} />
                 </FormControl>
                 <FormDescription>
-                  This is the name that will be displayed on your profile and in
-                  emails.
+                  Usuario dueño de la empresa
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -239,7 +243,7 @@ export function EmpresaForm() {
               <FormItem>
                 <FormLabel>Direccion</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your name" {...field} />
+                  <Input placeholder="Direccion" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -431,7 +435,7 @@ export function EmpresaForm() {
         </div>
         <div className="flex justify-center">
 
-          <Button type="submit">Guardar</Button>
+          <Button type="submit" onClick={() => form.setValue("userId", sessionUser)}>Guardar</Button>
         </div>
       </form>
     </Form>

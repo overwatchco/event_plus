@@ -11,7 +11,12 @@ import {
 
 import { EmpresaForm } from "../forms/create-form"
 
-export function CreateDialog() {
+import { getUserSessionServer } from "@/auth/actions/auth-actions"
+
+export async function CreateDialog() {
+    const user = await getUserSessionServer()
+
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -28,7 +33,7 @@ export function CreateDialog() {
 
 
                 {/* contenido de el dialog */}
-                <EmpresaForm />
+                <EmpresaForm sessionUser={user?.id ?? "No id"} />
                 {/* contenido de el dialog */}
             </DialogContent>
         </Dialog>

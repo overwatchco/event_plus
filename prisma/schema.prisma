@@ -18,15 +18,13 @@ enum Roles {
 }
 
 model Usuario {
-  id       String    @id @default(uuid())
-  nit      String?   @unique
-  cedula   Int       @unique
+  id       String  @id @default(uuid())
+  nit      String? @unique
+  cedula   Int     @unique
   nombre   String
-  email    String    @unique
+  email    String  @unique
   password String
-  rol      Roles     @default(NONE)
-  empresa  Empresa[]
-  acta     Acta[]
+  rol      Roles   @default(NONE)
 }
 
 // TODO: Posible cambio a la estructura usando encargado
@@ -41,9 +39,9 @@ model Empresa {
   ciudad       String
   direccion    String
   telefono     Int
-  usuario      Usuario    @relation(fields: [usuarioId], references: [id])
-  usuarioId    String
   Contrato     Contrato[]
+  User         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
 }
 
 model Contrato {
@@ -66,10 +64,10 @@ model Reunion {
 
 model Acta {
   id        String  @id @default(uuid())
-  usuario   Usuario @relation(fields: [usuarioId], references: [id])
-  usuarioId String
   reunion   Reunion @relation(fields: [reunionId], references: [id])
   reunionId String
+  User      User?   @relation(fields: [userId], references: [id])
+  userId    String?
 }
 
 model Evento {
@@ -137,6 +135,8 @@ model User {
   image    String?
   accounts Account[]
   sessions Session[]
+  empresas Empresa[]
+  actas    Acta[]
 }
 
 model VerificationToken {
