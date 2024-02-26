@@ -1,6 +1,7 @@
 'use server'
 
 import prisma from "@/app/lib/prisma"
+import { getUserSessionServer } from "@/auth/actions/auth-actions"
 import { Empresa } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 
@@ -84,7 +85,9 @@ export const deleteEmpresa = async (id: string): Promise<void> => {
 //Get empresas 
 export const getListEmpresa = async (): Promise<Empresa[]> => {
 
-    const empresas = await prisma.empresa.findMany({ orderBy: { nombre: 'desc' } })
+    const usuario = await getUserSessionServer()
+
+    const empresas = await prisma.empresa.findMany({ orderBy: { nombre: 'asc' }, where: { userId: usuario?.id } })
     if (!empresas) {
         throw `No hay empresas registradas`
     }
