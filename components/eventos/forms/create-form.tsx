@@ -22,26 +22,28 @@ import { v4 as uuidv4 } from 'uuid';
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-
+import { addEvento } from "@/actions/evento-actions";
+import { toast } from "@/components/ui/use-toast";
+import { z } from "zod";
+import { eventoFormSchema } from "./formSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const eventoId = uuidv4()
 
-interface NestedArrayItem {
-  subevento: string
-  item: string
-  fecha: string
-  itemId: string
-}
+type eventoFormValues = z.infer<typeof eventoFormSchema>
 
-interface Item {
-  id: string
-  servicio: string
-  descripcion: string
-  eventoId: string
-  nestedArray: NestedArrayItem[]
-}
 
-export default function Formulario() {
+export default function CreateForm() {
+
+
+  const form = useForm<eventoFormValues>({
+    resolver: zodResolver(eventoFormSchema),
+    defaultValues: {
+      nombre: "",
+
+
+    },
+  })
 
   //Se obtienen los datos de los contratos
   const { listContratos } = useContratosList()
@@ -53,47 +55,124 @@ export default function Formulario() {
   })) || []
 
 
-  const { register, control, handleSubmit, reset, setValue } = useForm<FieldValues>();
+  // const { register, control, handleSubmit, reset, setValue } = useForm<FieldValues>();
   const { fields, append, remove } = useFieldArray({
     name: "items",
-    control
+    control: form.control
   });
 
-  const onSubmit = (data: FieldValues) => console.log(data);
 
+  function onSubmit(data: eventoFormValues) {
+
+
+    const eventoData = {
+      id: data.id,
+      nombre: data.nombre,
+      descripcion: data.descripcion,
+      contratoId: data.contratoId,
+    }
+
+    const itemsData = data.items.map(item => ({
+      id: item.itemId,
+      servicio: item.servicio,
+      descripcion: item.descripcion,
+      eventoId: item.eventoId
+    }))
+
+    const requerimientoData = data.items.flatMap(item =>
+      item.requerimientos.map(nestedItem => ({
+        id: nestedItem.id,
+        subevento: nestedItem.subevento,
+        item: nestedItem.item,
+        fecha: new Date(nestedItem.fecha), // Asegúrate de que la fecha esté en el formato correcto
+        itemsId: nestedItem.itemsId
+      }))
+    )
+
+    console.log(data)
+
+
+
+
+    addEvento(eventoData, itemsData, requerimientoData)
+      .then((evento) => {
+        toast({
+          title: "Evento creado con éxito",
+          description: (
+            <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+              <code className="text-white">{JSON.stringify(evento, null, 2)}</code>
+            </pre>
+          ),
+        })
+      })
+      .catch((error) => {
+        // La promesa tuvo un error
+        console.error('Error al crear el evento:', error);
+        toast({
+          title: "Error al crear el evento",
+        })
+      })
+
+
+  }
   const addNestedArray = (index: number) => {
     const newArray = [...fields];
-    newArray[index].nestedArray.push({ id: uuidv4(), subevento: "", item: "", fecha: "", itemsId: newArray[index].itemId });
-    reset({ items: newArray });
-  };
+    newArray[index].requerimientos.push({
+      id: uuidv4(),
+      subevento: "",
+      item: "",
+      fecha: new Date(),
+      itemsId: newArray[index].itemId
+    })
+    form.reset({ items: newArray })
+  }
 
   const removeNestedArray = (index: number, nestedIndex: number) => {
-    const newArray = [...fields];
-    newArray[index].nestedArray.splice(nestedIndex, 1);
-    reset({ items: newArray });
-  };
+    const newArray = [...fields]
+    newArray[index].requerimientos.splice(nestedIndex, 1)
+    form.reset({ items: newArray })
+  }
 
 
 
   return (
 
-    <Form {...useForm<FieldValues>()}>
+    <Form {...form}>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
 
-        <FormItem className="mb-5">
-          <FormLabel>Evento</FormLabel>
-          <FormControl>
-            <Input placeholder="Evento" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+        <FormField
+          control={form.control}
+          name={"nombre"}
+          render={({ field }) => (
+            <FormItem className="mb-5">
+              <FormLabel>Evento</FormLabel>
+              <FormControl>
+                <Input placeholder="Evento" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-
+        <FormField
+          control={form.control}
+          name={"id"}
+          defaultValue={eventoId}
+          render={({ field }) => (
+            <FormItem className="mb-5 hidden">
+              <FormLabel>Evento id</FormLabel>
+              <FormControl>
+                <Input placeholder="Evento" {...field} disabled />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* NOTE: Campo de Empresa */}
         <FormField
-          control={control}
+          control={form.control}
           name="contratoId"
           render={({ field }) => (
             <FormItem className="flex flex-col">
@@ -128,7 +207,7 @@ export default function Formulario() {
                           value={contrato.label}
                           key={contrato.value}
                           onSelect={() => {
-                            setValue("empresaId", contrato.value)
+                            form.setValue("contratoId", contrato.value)
                           }}
                         >
                           <CheckIcon
@@ -150,51 +229,102 @@ export default function Formulario() {
           )}
         />
 
-        <FormItem className="mb-5">
-          <FormLabel>Descripcion</FormLabel>
-          <FormControl>
-            <Textarea
-              placeholder="Descripcion del evento"
-              className="resize-none"
-            />
-          </FormControl>
-        </FormItem>
+        <FormField
+          control={form.control}
+          name={"descripcion"}
+          render={({ field }) => (
+            <FormItem className="my-5">
+              <FormLabel>Descripcion</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Descripcion del evento"
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
 
         {fields.map((item: any, index) => (
           <div key={uuidv4()}>
 
 
-            <FormItem key={index} className="mb-5">
-              <FormLabel>Item</FormLabel>
-              <FormControl>
-                <Input placeholder="Item"  {...register(`items.${index}.name`)} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
 
 
+            <FormField
+              control={form.control}
+              name={`items.${index}.servicio`}
+              defaultValue={eventoId}
+              render={({ field }) => (
+                <FormItem key={`servicio-${index}`} className="mb-5">
+                  <FormLabel>Servicio</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Servicio"  {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={`items.${index}.descripcion`}
+              defaultValue={eventoId}
+              render={({ field }) => (
+                <FormItem className="mb-5" key={`descripcion-${index}`}>
+                  <FormLabel>Descripcion</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Descripcion del evento"
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
 
-            {item.nestedArray && item.nestedArray.map((nestedItem: any, nestedIndex: any) => (
+            {item.requerimientos && item.requerimientos.map((nestedItem: any, nestedIndex: any) => (
               <div key={uuidv4()} className="flex gap-5 my-5">
 
-                <FormItem key={uuidv4() + nestedItem}>
-                  <FormControl>
-                    <Input placeholder="Subevento"  {...register(`items.${index}.nestedArray.${nestedIndex}.subevento`)} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Subitem"  {...register(`items.${index}.nestedArray.${nestedIndex}.item`)} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <FormField
+                  control={form.control}
+                  name={`items.${index}.requerimientos.${nestedIndex}.subevento`}
+                  render={({ field }) => (
+
+                    <FormItem key={uuidv4() + nestedItem}>
+                      <FormControl>
+                        <Input placeholder="Subevento"  {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+
 
                 <FormField
-                  control={control}
-                  name={`items.${index}.nestedArray.${nestedIndex}.fecha`}
+                  control={form.control}
+                  name={`items.${index}.requerimientos.${nestedIndex}.item`}
+                  render={({ field }) => (
+
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Subitem"  {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+
+                  )}
+                />
+
+
+                <FormField
+                  control={form.control}
+                  name={`items.${index}.requerimientos.${nestedIndex}.fecha`}
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <Popover>
@@ -221,9 +351,6 @@ export default function Formulario() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
                             initialFocus
                           />
                         </PopoverContent>
@@ -256,8 +383,9 @@ export default function Formulario() {
             append({
               eventoId: eventoId,
               itemId: uuidv4(),
-              name: "",
-              nestedArray: []
+              servicio: "",
+              requerimientos: [],
+              descripcion: ""
             })
           }}>
 

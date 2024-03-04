@@ -17,16 +17,6 @@ enum Roles {
   NONE
 }
 
-model Usuario {
-  id       String  @id @default(uuid())
-  nit      String? @unique
-  cedula   Int     @unique
-  nombre   String
-  email    String  @unique
-  password String
-  rol      Roles   @default(NONE)
-}
-
 // TODO: Posible cambio a la estructura usando encargado
 // y trabajadores asociados
 
@@ -52,6 +42,7 @@ model Contrato {
   empresaId String
   reunion   Reunion[]
   evento    Evento[]
+  Informe   Informe[]
 }
 
 model Reunion {
@@ -71,28 +62,48 @@ model Acta {
 }
 
 model Evento {
-  id             String          @id @default(uuid())
-  fecha          DateTime
-  nombre         String
-  requerimientos Requerimiento[]
-  contrato       Contrato        @relation(fields: [contratoId], references: [id])
-  contratoId     String
+  id          String    @id @unique
+  nombre      String
+  descripcion String
+  contrato    Contrato  @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+  contratoId  String //NOTE: Contrato asociado al evento
+  Items       Items[]
+  Informe     Informe[]
+}
+
+model Items {
+  id            String          @id @unique
+  servicio      String
+  descripcion   String
+  Requerimiento Requerimiento[]
+  evento        Evento          @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  eventoId      String
 }
 
 model Requerimiento {
-  id          String   @id @default(uuid())
-  evento      Evento   @relation(fields: [eventoId], references: [id])
-  nombre      String
-  descripcion String?
-  eventoId    String
-  imagen      Imagen[]
+  id              String         @id @unique
+  subevento       String
+  item            String
+  fecha           DateTime
+  items           Items          @relation(fields: [itemsId], references: [id], onDelete: Cascade)
+  itemsId         String
+  imagenInforme   ImagenInforme? @relation(fields: [imagenInformeId], references: [id])
+  imagenInformeId String?
 }
 
-model Imagen {
-  id              String        @id @default(uuid())
-  path            String        @unique
-  requerimiento   Requerimiento @relation(fields: [requerimientoId], references: [id])
-  requerimientoId String
+model Informe {
+  id          String   @id @default(uuid())
+  portadaPath String?
+  evento      Evento   @relation(fields: [eventoId], references: [id])
+  eventoId    String
+  contrato    Contrato @relation(fields: [contratoId], references: [id])
+  contratoId  String
+}
+
+model ImagenInforme {
+  id            String          @id @default(uuid())
+  path          String
+  Requerimiento Requerimiento[]
 }
 
 //Auth js
