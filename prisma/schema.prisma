@@ -81,14 +81,13 @@ model Items {
 }
 
 model Requerimiento {
-  id              String         @id @unique
-  subevento       String
-  item            String
-  fecha           DateTime
-  items           Items          @relation(fields: [itemsId], references: [id], onDelete: Cascade)
-  itemsId         String
-  imagenInforme   ImagenInforme? @relation(fields: [imagenInformeId], references: [id])
-  imagenInformeId String?
+  id            String          @id @unique
+  subevento     String
+  item          String
+  fecha         DateTime
+  items         Items           @relation(fields: [itemsId], references: [id], onDelete: Cascade)
+  itemsId       String
+  ImagenInforme ImagenInforme[]
 }
 
 model Informe {
@@ -101,9 +100,11 @@ model Informe {
 }
 
 model ImagenInforme {
-  id            String          @id @default(uuid())
-  path          String
-  Requerimiento Requerimiento[]
+  id              String        @id @default(uuid())
+  fileKey         String
+  urlPath         String
+  requerimiento   Requerimiento @relation(fields: [requerimientoId], references: [id])
+  requerimientoId String
 }
 
 //Auth js
