@@ -1,11 +1,6 @@
-import { getContrato, getListContratos } from "@/actions/contrato-actions";
+import { getContrato, getListContratos, getListContratosByEmpresa } from "@/actions/contrato-actions";
 import { Contrato } from "@prisma/client";
 import { useEffect, useState } from "react";
-
-
-
-
-
 
 export const useContrato = (id: string) => {
 
@@ -26,6 +21,48 @@ export const useContrato = (id: string) => {
 
     return { contrato }
 
+}
+
+
+export const useContratosList = () => {
+
+    const [listContratos, setContratos] = useState<Contrato[] | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const contratosData = await getListContratos();
+                setContratos(contratosData)
+            } catch (error) {
+                console.error('Error al obtener la lista de empresas:', error)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    return { listContratos }
+}
+
+
+export const useContratosByEmpresaList = (empresaId?: string) => {
+
+    const [listContratos, setContratos] = useState<Contrato[] | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const contratosData = await getListContratosByEmpresa(empresaId);
+                setContratos(contratosData)
+            } catch (error) {
+                console.error('Error al obtener la lista de empresas:', error)
+            }
+        }
+
+        fetchData()
+    }, [])
+
+    return { listContratos }
 }
 
 
