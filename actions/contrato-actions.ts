@@ -31,6 +31,20 @@ export const getListContratos = async (): Promise<Contrato[]> => {
 }
 
 
+//Obtener contrato por empresa
+export const getListContratosByEmpresa = async (empresaId?: string): Promise<Contrato[]> => {
+
+    const contratos = await prisma.contrato.findMany({
+        where: {
+            empresaId: empresaId
+        }
+    })
+
+    return contratos
+}
+
+
+
 
 //Crear contrato
 
