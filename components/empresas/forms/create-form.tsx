@@ -90,7 +90,16 @@ interface Props {
 export function EmpresaForm({ sessionUser }: Props) {
   const form = useForm<empresaFormValues>({
     resolver: zodResolver(empresaFormSchema),
-    defaultValues,
+    defaultValues: {
+      nombre: "",
+      nit: "",
+      pais: "",
+      departamento: "",
+      ciudad: "",
+      direccion: "",
+      telefono: +""
+      
+    }
   })
 
 

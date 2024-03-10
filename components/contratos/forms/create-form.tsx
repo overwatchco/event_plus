@@ -38,13 +38,16 @@ type contratoFormValues = z.infer<typeof contratoFormSchema>
 
 //NOTE: Colocar valor de deafault de id usuario 
 const defaultValues: Partial<contratoFormValues> = {
-  // usuarioId: "uuid()",
 }
 
 export function CreateForm() {
   const form = useForm<contratoFormValues>({
     resolver: zodResolver(contratoFormSchema),
-    defaultValues,
+    defaultValues: {
+      empresaId: "",
+      nit: "",
+      objeto: ""
+    }
   })
 
 
