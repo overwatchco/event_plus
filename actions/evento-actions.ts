@@ -4,6 +4,7 @@ import prisma from "@/app/lib/prisma"
 import { getUserSessionServer } from "@/auth/actions/auth-actions"
 import { Evento, Items, Requerimiento } from "@prisma/client"
 import { revalidatePath } from "next/cache"
+import { getListContratos } from "./contrato-actions"
 
 
 export const addEvento = async (
@@ -98,15 +99,20 @@ export const addEvento = async (
 // // }
 
 
-// // //Get empresas 
-// // export const getListEmpresa = async (): Promise<Empresa[]> => {
+export const getEventos = async (): Promise<Evento[]> => {
+    try {
+        const contratos = await getListContratos();
 
-// //     const usuario = await getUserSessionServer()
+        const eventos = await prisma.evento.findMany({
+            where: {
+                contratoId: {
+                    in: contratos.map(contrato => contrato.id),
+                },
+            },
+        });
 
-// //     const empresas = await prisma.empresa.findMany({ orderBy: { nombre: 'asc' }, where: { userId: usuario?.id } })
-// //     if (!empresas) {
-// //         throw `No hay empresas registradas`
-// //     }
-
-// //     return empresas
-// // }
+        return eventos;
+    } catch (error) {
+        throw error;
+    }
+}
