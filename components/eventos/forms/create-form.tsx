@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +17,7 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command"
-import { useForm, useFieldArray, Control, FieldValues, UseFormReturn } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -55,7 +55,6 @@ export default function CreateForm() {
   })) || []
 
 
-  // const { register, control, handleSubmit, reset, setValue } = useForm<FieldValues>();
   const { fields, append, remove } = useFieldArray({
     name: "items",
     control: form.control
@@ -84,7 +83,7 @@ export default function CreateForm() {
         id: nestedItem.id,
         subevento: nestedItem.subevento,
         item: nestedItem.item,
-        fecha: new Date(nestedItem.fecha), // Asegúrate de que la fecha esté en el formato correcto
+        fecha: new Date(nestedItem.fecha),
         itemsId: nestedItem.itemsId
       }))
     )
@@ -124,13 +123,13 @@ export default function CreateForm() {
       fecha: new Date(),
       itemsId: newArray[index].itemId
     })
-    form.reset({ items: newArray })
+    form.setValue('items', newArray)
   }
 
   const removeNestedArray = (index: number, nestedIndex: number) => {
     const newArray = [...fields]
     newArray[index].requerimientos.splice(nestedIndex, 1)
-    form.reset({ items: newArray })
+    form.setValue('items', newArray)
   }
 
 
@@ -248,11 +247,9 @@ export default function CreateForm() {
 
 
         {fields.map((item: any, index) => (
-          <div key={uuidv4()}>
 
 
-
-
+          <div key={index}>
             <FormField
               control={form.control}
               name={`items.${index}.servicio`}
@@ -288,32 +285,17 @@ export default function CreateForm() {
 
 
             {item.requerimientos && item.requerimientos.map((nestedItem: any, nestedIndex: any) => (
-              <div key={uuidv4()} className="flex gap-5 my-5">
+              <div key={nestedItem.id} className="flex gap-5 my-5">
 
                 <FormField
-                  control={form.control}
-                  name={`items.${index}.requerimientos.${nestedIndex}.subevento`}
-                  render={({ field }) => (
-
-                    <FormItem key={uuidv4() + nestedItem}>
-                      <FormControl>
-                        <Input placeholder="Subevento"  {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-
-
-                <FormField
+                  key={`${nestedIndex}${nestedItem}item`}
                   control={form.control}
                   name={`items.${index}.requerimientos.${nestedIndex}.item`}
                   render={({ field }) => (
 
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Subitem"  {...field} />
+                        <Input placeholder="Subitem" autoComplete="off"  {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -321,8 +303,24 @@ export default function CreateForm() {
                   )}
                 />
 
+                <FormField
+                  key={`${nestedIndex}${nestedItem}subevento`}
+                  control={form.control}
+                  name={`items.${index}.requerimientos.${nestedIndex}.subevento`}
+                  render={({ field }) => (
+
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Subevento" autoComplete="off"  {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
 
                 <FormField
+                  key={`${nestedIndex}${nestedItem}fecha`}
                   control={form.control}
                   name={`items.${index}.requerimientos.${nestedIndex}.fecha`}
                   render={({ field }) => (
@@ -360,17 +358,23 @@ export default function CreateForm() {
                   )}
                 />
 
-                <Button size="icon" variant="destructive" onClick={() => removeNestedArray(index, nestedIndex)}><TrashIcon width={20} height={20} /></Button>
+                <Button
+                  size="icon"
+                  type="button"
+                  variant="destructive"
+                  onClick={() => removeNestedArray(index, nestedIndex)}>
+                  <TrashIcon width={20} height={20} />
+                </Button>
               </div>
 
             ))}
 
             <div className="flex gap-2 mb-2 w-1/6">
-              <Button onClick={() => addNestedArray(index)} className="">
+              <Button type="button" onClick={() => addNestedArray(index)} className="">
                 <PlusCircledIcon height={20} width={20} className="mr-2" />
                 Agregar Requerimiento
               </Button>
-              <Button variant="destructive" onClick={() => remove(index)}>
+              <Button type="button" variant="destructive" onClick={() => remove(index)}>
                 <TrashIcon width={20} height={20} />
                 Eliminar Item
               </Button>
@@ -379,17 +383,23 @@ export default function CreateForm() {
         ))}
         <div className="flex gap-2">
 
-          <Button type="button" onClick={() => {
-            append({
-              eventoId: eventoId,
-              itemId: uuidv4(),
-              servicio: "",
-              requerimientos: [],
-              descripcion: ""
-            })
-          }}>
+          <Button
+            type="button"
+            onClick={() => {
+              append({
+                eventoId: eventoId,
+                itemId: uuidv4(),
+                servicio: "",
+                requerimientos: [],
+                descripcion: ""
+              })
+            }}>
 
-            <PlusCircledIcon height={20} width={20} className="mr-2" />
+            <PlusCircledIcon
+              height={20}
+              width={20}
+              className="mr-2"
+            />
             Agregar Item
           </Button>
         </div>
