@@ -38,7 +38,7 @@ model Contrato {
   id        String    @id @default(uuid())
   nit       String    @unique
   objeto    String
-  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+  empresa   Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
   empresaId String
   reunion   Reunion[]
   evento    Evento[]
@@ -66,7 +66,7 @@ model Evento {
   nombre      String
   descripcion String
   contrato    Contrato  @relation(fields: [contratoId], references: [id], onDelete: Cascade)
-  contratoId  String //NOTE: Contrato asociado al evento
+  contratoId  String    @unique //NOTE: Contrato asociado al evento
   Items       Items[]
   Informe     Informe[]
 }
@@ -103,7 +103,7 @@ model ImagenInforme {
   id              String        @id @default(uuid())
   fileKey         String
   urlPath         String
-  requerimiento   Requerimiento @relation(fields: [requerimientoId], references: [id])
+  requerimiento   Requerimiento @relation(fields: [requerimientoId], references: [id], onDelete: Cascade)
   requerimientoId String
 }
 
