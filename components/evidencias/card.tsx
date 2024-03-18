@@ -1,5 +1,3 @@
-import * as React from "react"
-
 import {
     Card,
     CardContent,
@@ -15,9 +13,14 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import { MultiUploader } from "./multi-uploader";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-
-
+interface Evento {
+    id: string
+    nombre: string
+    descripcion: string
+}
 
 interface Requerimiento {
     id: string;
@@ -34,11 +37,28 @@ interface Item {
 }
 
 interface Props {
-    item: Item;
+    item: Item
 }
-export default async function ItemsCard({ item }: Props) {
 
+export async function EventoCard({ id, nombre, descripcion }: Evento) {
+    return (
+        <Card className="w-[350px] col-span-1">
+            <CardHeader>
+                <CardTitle>{nombre}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {descripcion}
+            </CardContent>
+            <CardFooter className="flex justify-between">
+                <Link href={`/evidencias/${id}`}>
+                    <Button>Gestionar evidencias</Button>
+                </Link>
+            </CardFooter>
+        </Card>
+    )
+}
 
+export async function ItemsCard({ item }: Props) {
     return (
         <Card className="w-[350px] col-span-1">
             <CardHeader>
@@ -46,8 +66,6 @@ export default async function ItemsCard({ item }: Props) {
                 <CardDescription>{item.descripcion}</CardDescription>
             </CardHeader>
             <CardContent>
-
-
                 {item && item.Requerimiento.map((requerimiento) => (
                     <Accordion type="single" collapsible key={requerimiento.id}>
                         <AccordionItem value={requerimiento.id}>
@@ -69,6 +87,3 @@ export default async function ItemsCard({ item }: Props) {
         </Card>
     )
 }
-
-
-
