@@ -3,6 +3,12 @@
         "prisma",
         "enpoint",
         "ui",
-        "empresas"
+        "empresas",
+        "auth",
+        "contratos",
+        "items",
+        "eventos",
+        "evidencias",
+        "dashboard"
     ]
 }
