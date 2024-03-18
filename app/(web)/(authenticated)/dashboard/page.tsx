@@ -1,127 +1,156 @@
 import { Metadata } from "next"
+import Image from "next/image"
+import { PlusCircledIcon } from "@radix-ui/react-icons"
 
+import { Button } from "@/components/ui/button"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
 
-import { RecentSales } from "@/components/dashboard/recent-sales"
-import { UserNav } from "@/components/dashboard/user-nav"
+import { listenNowAlbums, madeForYouAlbums } from "@/app/mocks/albums"
+import { PodcastEmptyPlaceholder } from "@/components/dashboard/podcast-empty-placeholder"
+import { AlbumArtwork } from "@/components/dashboard/album-artwork"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-    title: "Dashboard",
-    description: "Example dashboard app built using the components.",
+    title: "Event Plus | dashboard",
+    description: "Gestion de contratos",
 }
 
-export default function DashboardPage() {
+export default function MusicPage() {
     return (
+        <>
+            <div className="md:hidden">
+                <Image
+                    src="/examples/music-light.png"
+                    width={1280}
+                    height={1114}
+                    alt="Music"
+                    className="block dark:hidden"
+                />
+                <Image
+                    src="/examples/music-dark.png"
+                    width={1280}
+                    height={1114}
+                    alt="Music"
+                    className="hidden dark:block"
+                />
+            </div>
+            <div className="hidden md:block">
+                <div className="border-t">
+                    <div className="bg-background">
+                        <div className="grid">
+                            <div className="col-span-5 lg:border-l">
+                                <div className="h-full px-4 py-6 lg:px-8">
+                                    <Tabs defaultValue="music" className="h-full space-y-6">
+                                        <div className="space-between flex items-center">
+                                            <TabsList>
+                                                <TabsTrigger value="music" className="relative">
+                                                    Music
+                                                </TabsTrigger>
+                                                <TabsTrigger value="podcasts">Podcasts</TabsTrigger>
+                                                <TabsTrigger value="live" disabled>
+                                                    Live
+                                                </TabsTrigger>
+                                            </TabsList>
+                                            <div className="ml-auto mr-4">
 
-
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3">
-                    <Link href={'/morning'}>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    Morning
-                                </CardTitle>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    className="h-4 w-4 text-muted-foreground"
-                                >
-                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                                </svg>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">$45,231.89</div>
-                                <p className="text-xs text-muted-foreground">
-                                    +20.1% from last month
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                    <Link href={"/noon"}>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Noon</CardTitle>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    className="h-4 w-4 text-muted-foreground"
-                                >
-                                    <rect width="20" height="14" x="2" y="5" rx="2" />
-                                    <path d="M2 10h20" />
-                                </svg>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">+12,234</div>
-                                <p className="text-xs text-muted-foreground">
-                                    +19% from last month
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                    <Link href={"/night"}>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    Night
-                                </CardTitle>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    className="h-4 w-4 text-muted-foreground"
-                                >
-                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                                </svg>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">+573</div>
-                                <p className="text-xs text-muted-foreground">
-                                    +201 since last hour
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-
-                    <Card className="col-span-3">
-                        <CardHeader>
-                            <CardTitle>Recent Sales</CardTitle>
-                            <CardDescription>
-                                You made 265 sales this month.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <RecentSales />
-                        </CardContent>
-                    </Card>
+                                                <Link href={"/documentos"}>
+                                                    <Button>
+                                                        <PlusCircledIcon className="mr-2 h-4 w-4" />
+                                                        Crear documento
+                                                    </Button>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <TabsContent
+                                            value="music"
+                                            className="border-none p-0 outline-none"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-1">
+                                                    <h2 className="text-2xl font-semibold tracking-tight">
+                                                        Listen Now
+                                                    </h2>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Top picks for you. Updated daily.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Separator className="my-4" />
+                                            <div className="relative">
+                                                <ScrollArea>
+                                                    <div className="flex space-x-4 pb-4">
+                                                        {listenNowAlbums.map((album) => (
+                                                            <AlbumArtwork
+                                                                key={album.name}
+                                                                album={album}
+                                                                className="w-[250px]"
+                                                                aspectRatio="portrait"
+                                                                width={250}
+                                                                height={330}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <ScrollBar orientation="horizontal" />
+                                                </ScrollArea>
+                                            </div>
+                                            <div className="mt-6 space-y-1">
+                                                <h2 className="text-2xl font-semibold tracking-tight">
+                                                    Made for You
+                                                </h2>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Your personal playlists. Updated daily.
+                                                </p>
+                                            </div>
+                                            <Separator className="my-4" />
+                                            <div className="relative">
+                                                <ScrollArea>
+                                                    <div className="flex space-x-4 pb-4">
+                                                        {madeForYouAlbums.map((album) => (
+                                                            <AlbumArtwork
+                                                                key={album.name}
+                                                                album={album}
+                                                                className="w-[150px]"
+                                                                aspectRatio="square"
+                                                                width={150}
+                                                                height={150}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                    <ScrollBar orientation="horizontal" />
+                                                </ScrollArea>
+                                            </div>
+                                        </TabsContent>
+                                        <TabsContent
+                                            value="podcasts"
+                                            className="h-full flex-col border-none p-0 data-[state=active]:flex"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-1">
+                                                    <h2 className="text-2xl font-semibold tracking-tight">
+                                                        New Episodes
+                                                    </h2>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Your favorite podcasts. Updated daily.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Separator className="my-4" />
+                                            <PodcastEmptyPlaceholder />
+                                        </TabsContent>
+                                    </Tabs>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-
+        </>
     )
 }
