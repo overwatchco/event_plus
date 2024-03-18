@@ -10,10 +10,13 @@ const requerimentoSchema = z.object({
 
 const itemsSchema = z.object({
     itemId: z.string(),
-    servicio: z.string(),
-    requerimientos: z.array(requerimentoSchema),
-    descripcion: z.string(),
+    servicio: z.string().min(3, { message: "Debe ingresar mas de 3 caracteres" }),
+    descripcion: z
+        .string()
+        .min(10, { message: "La descripcion debe tener al menos 10 caracteres" })
+        .max(2000, { message: "Debe tener menos de 2000 caracteres" }),
     eventoId: z.string(),
+    requerimientos: z.array(requerimentoSchema),
 })
 
 

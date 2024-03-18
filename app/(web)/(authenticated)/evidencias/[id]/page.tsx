@@ -1,5 +1,5 @@
 import { obtenerItemsYRequerimientos } from "@/actions/items-actions";
-import ItemsCard from "@/components/evidencias/card";
+import { ItemsCard } from "@/components/evidencias/card"
 
 export default async function EvidenciasIdPage({ params }: { params: { slug: string } }) {
     try {
