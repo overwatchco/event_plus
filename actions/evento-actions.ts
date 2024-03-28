@@ -116,3 +116,28 @@ export const getEventos = async (): Promise<Evento[]> => {
         throw error;
     }
 }
+
+
+//TODO: Arreglar el tipo que devuelve esta funcion
+export const getEvento = async (eventoId: string): Promise<any> => {
+    try {
+        const evento = await prisma.evento.findUnique({
+            where: {
+                id: eventoId
+            },
+            include: {
+                Items: {
+                    include: {
+                        Requerimiento: true
+                    }
+                }
+            }
+        })
+
+        return evento
+
+    } catch (error) {
+        throw error
+    }
+
+}
