@@ -30,6 +30,7 @@ export async function UserNav() {
     const userRoles = session?.user?.roles
 
     //TODO: Rol usuario
+    //TODO: Cambiar este componente a otra carpeta en donde se relacione con la navbar
 
     return (
 

@@ -9,6 +9,8 @@
         "items",
         "eventos",
         "evidencias",
-        "dashboard"
+        "dashboard",
+        "requerimientos",
+        "formatoEvidencias"
     ]
 }
