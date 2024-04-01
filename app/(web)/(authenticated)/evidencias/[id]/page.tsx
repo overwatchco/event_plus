@@ -1,15 +1,17 @@
 import { obtenerItemsYRequerimientos } from "@/actions/items-actions";
 import { ItemsCard } from "@/components/evidencias/card"
 
-export default async function EvidenciasIdPage({ params }: { params: { slug: string } }) {
+export default async function EvidenciasIdPage({ params }: { params: { id: string } }) {
     try {
-        const data = await obtenerItemsYRequerimientos(params.slug);
+        const data = await obtenerItemsYRequerimientos(params.id);
+        console.log(params.id)
 
         return (
             <div className="container mt-5 grid grid-cols-3 gap-6">
                 {data && data.map((item) => (
                     <ItemsCard
                         key={item.id}
+                        //TODO: ARREGLAR EL TIPADO DE ESTA PARTE
                         item={item}
                     />
                 ))}
