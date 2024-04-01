@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
 import { toast } from "@/components/ui/use-toast"
+import { generateFile } from "@/utils/documentGenerator"
+import { getEvento } from "@/actions/evento-actions"
 
 interface Props {
     eventos: {
@@ -58,7 +60,7 @@ export const SelectForm = ({ eventos }: Props) => {
 
 
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
         toast({
             title: "You submitted the following values:",
             description: (
@@ -67,6 +69,13 @@ export const SelectForm = ({ eventos }: Props) => {
                 </pre>
             ),
         })
+
+        const evento = await getEvento(data.evento)
+        console.log(evento)
+
+
+        generateFile(evento)
+
     }
 
 
