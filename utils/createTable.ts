@@ -1,17 +1,11 @@
 import { getImages } from '@/actions/image-actions'
+import { Requerimiento } from '@prisma/client'
 import { AlignmentType, ImageRun, TextRun, WidthType } from 'docx'
 import { Paragraph, Table, TableCell, TableRow, VerticalAlign } from 'docx'
 
 
 
-interface Requerimiento {
-    id: string
-    subevento: string
-    item: string
-    fecha: string
-    itemsId: string
 
-}
 interface Imagen {
     id: string
     fileKey: string
@@ -78,13 +72,6 @@ export class TableCreator {
             }
         })
 
-
-
-
-
-    
-
-
         //return the table
         return (table)
     }
@@ -114,7 +101,7 @@ export class TableCreator {
                 new TableCell({
                     children: [
                         new Paragraph({
-                            text: requerimiento.fecha,
+                            text: requerimiento.fecha.toDateString(),
                             alignment: AlignmentType.RIGHT
                         }),
                     ]

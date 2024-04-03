@@ -2,48 +2,23 @@ import { Document, HeadingLevel, ImageRun, Packer, Paragraph, SectionType, Table
 import { saveAs } from "file-saver"
 import { TableCreator } from "./createTable"
 import { getImages } from "@/actions/image-actions";
+import { fullEvento } from "@/actions/evento-actions";
 
-const exampleTest = {
-    "id": "6796fe09-7e39-4db4-846f-823e25c2e92a",
-    "nombre": "Prueba evento",
-    "descripcion": "Descripcion Prueba",
-    "contratoId": "56c71f67-7e07-43f3-bfe2-73a6e62dd4e3",
-    "Items": [
-        {
-            "id": "02fd578e-7778-4e00-a951-8541d88b83b2",
-            "servicio": "Servicio Prueba",
-            "descripcion": "Descripcion Prueba",
-            "eventoId": "6796fe09-7e39-4db4-846f-823e25c2e92a",
-            "Requerimiento": [
-                {
-                    "id": "b33d9f77-aacd-4a15-a40f-9f45200375ed",
-                    "subevento": "Subevento Prueba",
-                    "item": "Subitem prueba",
-                    "fecha": "2024-03-28T05:00:00.000Z",
-                    "itemsId": "02fd578e-7778-4e00-a951-8541d88b83b2"
-                }
-            ]
-        }
-    ]
+
+async function getFromUrl(url: string) {
+    const blob = await fetch(url).then((r) => r.blob());
+    return blob
 }
 
 
-async function generateFromUrl(url: string) {
-    const blob = await fetch(
-        url
-    ).then(r => r.blob());
-}
-
-const text = '"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ac ornare ligula. Curabitur eget nisl sed mauris ultrices egestas. Suspendisse potenti. Etiam nec nisl laoreet sapien mollis vestibulum. Curabitur in lectus vitae nibh fermentum dignissim vel eget mauris. Mauris viverra sagittis felis, nec posuere tortor convallis vitae. Sed at sem lacinia, tristique lectus ac, tincidunt quam. Aliquam et porta leo, a vulputate massa. Sed et orci auctor, vulputate ex eget, blandit libero. Cras varius elementum euismod. Duis in augue eget lorem condimentum imperdiet efficitur sed turpis. Cras mattis lacus nec sem malesuada, nec viverra sem venenatis. Fusce mi metus, pretium nec tortor id, tempor mattis erat. Praesent orci nisi, posuere at arcu quis, finibus porta risus. Morbi luctus ante in condimentum aliquet." '
-
-export async function generateFile(evento: any) {
+export async function generateFile(evento: fullEvento | null) {
 
     const tablaRequerimientos = new TableCreator()
 
 
     //NOTE: PORTADA DEL DOCUMENTO
     const titulo = new Paragraph({
-        text: "Titulo del documento",
+        text: evento?.nombre,
         heading: "Title",
         alignment: "center",
     })
@@ -54,7 +29,7 @@ export async function generateFile(evento: any) {
             size: 20,
             bold: true,
         },
-        text: "CONTRATO NO.25292-11",
+        text: evento?.contratoId,
         alignment: "center",
     })
 
@@ -63,64 +38,100 @@ export async function generateFile(evento: any) {
         run: {
             size: 20,
         },
-        text: text,
+        text: evento?.descripcion,
         alignment: "distribute",
     })
 
 
     //NOTE: ITEMS DEL DOCUMENTO
+    //ALMACENA CADA UNO DE LOS ITEMS 
 
     let items = []
 
-    for (let index = 0; index < exampleTest.Items.length; index++) {
-        const item = exampleTest.Items[index]
-
-        items.push(
+    if (evento?.Items) {
 
 
-            new Paragraph({
-                text: `Item ${index + 1}. ` + item.servicio,
-                heading: "Heading1",
-                alignment: "left"
-            }),
+        let item = evento.Items
+
+        for (let index = 0; index < item.length; index++) {
 
 
-            new Paragraph({
-                run: {
-                    size: 20,
-                },
-                text: `DESCRIPCION: ${item.descripcion}`,
-                alignment: "left"
-            }),
-
-            tablaRequerimientos.CreateTable(item.Requerimiento),
+            //IMAGENES DE EVIDENCIA
+            const dbImagenesEvidencias = await Promise.all(
+                item[index].Requerimiento.map(async (requerimiento) => {
+                    const images = await getImages(requerimiento.id)
+                    return images
+                })
+            )
 
 
 
+            //OBTIENE CADA UNA DE LAS IMAGENES DE EVIDENCIA
+            let imageRuns = []
 
-            new Paragraph({
-                text: 'REGISTRO FOTOGRÁFICO',
-                heading: "Heading1",
-                alignment: "left",
+            for (let i = 0; i < dbImagenesEvidencias.length; i++) {
+                for (let j = 0; j < dbImagenesEvidencias[i].length; j++) {
+                    let imageRun = new ImageRun({
+                        type: 'jpg',
 
-                children: [
-
-                    
-
-                ]
-            }),
-
+                        //TODO: REVISAR POR QUE BLOB NO ES VALIDO SI ASI VIENE EN LA DOCUMENTACION
+                        data: await getFromUrl(dbImagenesEvidencias[i][j]),
+                        transformation: {
+                            width: 100,
+                            height: 100,
+                        },
+                    });
+                    imageRuns.push(imageRun)
+                }
+            }
 
 
 
 
-        )
+            items.push(
+                new Paragraph({
+                    text: `Item ${index + 1}. ` + item[index].servicio,
+                    heading: "Heading1",
+                    alignment: "left"
+                }),
+
+
+                new Paragraph({
+                    run: {
+                        size: 20,
+                    },
+                    text: `DESCRIPCION: ${item[index].descripcion}`,
+                    alignment: "left"
+                }),
+
+
+                //NOTE: CREA UNA TABLA CON LOS REQUERIMIENTOS
+                tablaRequerimientos.CreateTable(item[index].Requerimiento),
+
+                //REGISTRO FOTOGRAFICO EVIDENCIA DEL EVENTO
+
+                new Paragraph({
+                    text: 'REGISTRO FOTOGRÁFICO',
+                    heading: "Heading1",
+                    alignment: "left",
+                }),
+
+                new Paragraph({
+                    children: imageRuns
+                })
+
+            )
+
+        }
 
     }
 
 
+
     const doc = new Document({
 
+
+        //NOTE: CONFIGURACION DEL DOCUMENTO
         creator: "Event Plus",
         title: "Documento evidencias",
         // NOTE: CONFIGURACION DE LOS ESTILOS DEL DOCUMENTO
@@ -153,6 +164,7 @@ export async function generateFile(evento: any) {
             }
         },
 
+        //PAGINAS O SECCIONES DEL DOCUMENTO EN GENERAL
         sections: [
             {
                 properties: {
@@ -172,19 +184,12 @@ export async function generateFile(evento: any) {
                 // NOTE: ITEMS DEL DOCUMENTO 
                 children: items
             },
-            {
-                properties: {
-                    type: "nextPage"
-                },
-                // NOTE: ITEMS DEL DOCUMENTO 
-                children: items
-            }
         ],
 
     })
 
 
-
+    //GENERA EL DOCUMENTO EN UN ARCHIVO DOC 
     Packer.toBlob(doc).then(blob => {
         console.log(blob)
         saveAs(blob, "informe.docx")

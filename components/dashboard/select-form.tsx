@@ -71,8 +71,6 @@ export const SelectForm = ({ eventos }: Props) => {
         })
 
         const evento = await getEvento(data.evento)
-        console.log(evento)
-
 
         generateFile(evento)
 
@@ -106,7 +104,10 @@ export const SelectForm = ({ eventos }: Props) => {
 
                                             {
                                                 eventos.map((evento =>
-                                                    <SelectItem key={evento.id} value={evento.id}>  {evento.nombre}</SelectItem>
+                                                    <SelectItem key={evento.id}
+                                                        value={evento.id}>
+                                                        {evento.nombre}
+                                                    </SelectItem>
                                                 ))
 
                                             }
