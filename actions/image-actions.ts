@@ -12,7 +12,7 @@ export async function getImages(requerimientoId: string) {
             }
         )
 
-        return imagenes
+        return imagenes.map((imagen) => imagen.urlPath)
 
     } catch (error) {
 
