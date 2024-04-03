@@ -2,7 +2,7 @@
 
 import prisma from "@/app/lib/prisma"
 import { getUserSessionServer } from "@/auth/actions/auth-actions"
-import { Evento, Items, Requerimiento } from "@prisma/client"
+import { Evento, Items, Prisma, Requerimiento } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { getListContratos } from "./contrato-actions"
 
@@ -60,7 +60,11 @@ export const getEventos = async (): Promise<Evento[]> => {
 }
 
 
-export const getEvento = async (eventoId: string): Promise<Evento | null> => {
+export type fullEvento = Prisma.EventoGetPayload<{
+    include: { Items: { include: { Requerimiento: true } } },
+}>
+
+export const getEvento = async (eventoId: string): Promise<fullEvento | null> => {
     try {
         const evento = await prisma.evento.findUnique({
             where: {
